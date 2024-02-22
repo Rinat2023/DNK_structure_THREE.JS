@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r58/three.min.js"></script>
+    <script>
+      var scene = new THREE.Scene();
+      var camera = new THREE.PerspectiveCamera(
+        75,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        1000
+      );
+
+      var renderer = new THREE.WebGLRenderer({ antialias: true });
+
+      var red = 0xff0000;
+      var green = 0x00ff00;
+      var blue = 0x0000ff;
+
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.body.appendChild(renderer.domElement);
+
+      camera.position.z = 90;
+      camera.position.y = 10;
+
+      var tubeGeometry = new THREE.CylinderGeometry(0.5, 0.5, 10, 32);
+      var ballGeometry = new THREE.SphereGeometry(2, 32, 32);
+      var redMaterial = new THREE.MeshBasicMaterial({ color: red });
+      var greenMaterial = new THREE.MeshBasicMaterial({ color: green });
+      var blueMaterial = new THREE.MeshBasicMaterial({ color: blue });
+
+      var dna = new THREE.Object3D();
+      var holder = new THREE.Object3D();
+
+      for (var i = 0; i <= 40; i++) {
+        var redTube = new THREE.Mesh(tubeGeometry, redMaterial);
+        redTube.rotation.z = (90 * Math.PI) / 180;
+        redTube.position.x = -5;
+
+        var greenTube = new THREE.Mesh(tubeGeometry, greenMaterial);
+        greenTube.rotation.z = (90 * Math.PI) / 180;
+        greenTube.position.x = 5;
+
+        var ballRight = new THREE.Mesh(ballGeometry, blueMaterial);
+        ballRight.position.x = 10;
+
+        var ballLeft = new THREE.Mesh(ballGeometry, blueMaterial);
+        ballLeft.position.x = -10;
+
+        var row = new THREE.Object3D();
+        row.add(redTube);
+        row.add(greenTube);
+        row.add(ballRight);
+        row.add(ballLeft);
+
+        row.position.y = i * 5;
+        row.rotation.y = (25 * i * Math.PI) / 180;
+
+        dna.add(row);
+      }
+
+      dna.position.y = -70;
+
+      scene.add(dna);
+
+      setInterval(changeColor1, 2000);
+      setInterval(changeColor2, 2000);
+
+      function changeColor1() {
+        dna.children[0].children[1].material.color.setHex(getRandomColor());
+      }
+
+      function changeColor2() {
+        dna.children[0].children[0].material.color.setHex(getRandomColor());
+      }
+
+      function getRandomColor() {
+        return Math.random() * 0xffffff;
+      }
+
+      holder.add(dna);
+      scene.add(holder);
+
+      var render = function () {
+        requestAnimationFrame(render);
+        holder.rotation.y += 0.01;
+        camera.lookAt(holder.position);
+        renderer.render(scene, camera);
+      };
+
+      render();
+    </script>
+  </body>
+</html>
